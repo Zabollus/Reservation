@@ -9,6 +9,7 @@
                 <th scope="col" class="col-1">#</th>
                 <th scope="col" class="col-2">Nazwa</th>
                 <th scope="col" class="col-1">Pojemność</th>
+                <th scope="col" class="col-2">Dostępność</th>
                 <th scope="col" class="col-5">Dostępność rzutnika</th>
             </tr>
         </thead>
@@ -17,24 +18,27 @@
             <tr class="d-flex">
                 <th scope="row" class="col-1">{{ room.id }}</th>
                 <td class="col-2">
-{#                    <a href="{% url 'room' id=room.id %}">{{ room.name }}</a>#}
-                    {{ room.name }}
+                    <a href="{% url 'room' room_id=room.id %}">{{ room.name }}</a>
                 </td>
                 <td class="col-1">{{ room.capacity }}</td>
+                {% if room.reserved %}
+                    <td class="col-2" style="color:red;">Zarezerwowana</td>
+                {% else %}
+                    <td class="col-2" style="color:green;">Dostępna</td>
+                {% endif %}
                 {% if room.projector_availability %}
                     <td class="col-2" style="color:green;">&#9745;</td>
                 {% else %}
                     <td class="col-2" style="color:red;">&#9746;</td>
                 {% endif %}
                 <td class="col-1">
-                    <a href="{% url 'room-modify' id=room.id %}">edytuj</a>
+                    <a href="{% url 'room-modify' room_id=room.id %}">edytuj</a>
                 </td>
                 <td class="col-1">
-                    <a href="{% url 'room-delete' id=room.id %}">usuń</a>
+                    <a href="{% url 'room-delete' room_id=room.id %}">usuń</a>
                 </td>
                 <td class="col-1">
-{#                    <a href="{% url 'room-reserve' id=room.id %}">zarezerwuj</a>#}
-                    zarezerwuj
+                    <a href="{% url 'room-reserve' room_id=room.id %}">zarezerwuj</a>
                 </td>
             </tr>
                 {% empty %}

@@ -1,8 +1,8 @@
 from django.shortcuts import render, redirect
 from django.views import View
-from reservationapp.models import Room
-from reservationapp.forms import RoomAddForm
-
+from reservationapp.models import Room, Reservation
+from reservationapp.forms import RoomAddForm, ReservationForm
+import datetime
 # Create your views here.
 
 
@@ -33,6 +33,9 @@ class RoomAddView(View):
 class RoomListView(View):
     def get(self, request):
         rooms = Room.objects.all().order_by('id')
+        for room in rooms:
+            reservation_dates = [reservation.date for reservation in room.reservation_set.all()]
+            room.reserved = datetime.date.today() in reservation_dates
         return render(request, 'rooms.html', {'rooms': rooms})
 
 
@@ -76,3 +79,34 @@ class RoomModifyView(View):
             return redirect('/')
 
 
+class ReservationView(View):
+    def get(self, request, room_id):
+        room = Room.objects.get(id=room_id)
+        form = ReservationForm()
+        title = 'Zarezerwuj salę'
+        reservations = room.reservation_set.filter(date__gte=str(datetime.date.today())).order_by('date')
+        return render(request, 'form.html', {'form': form, 'title': title, 'room': room, 'reservations': reservations})
+
+    def post(self, request, room_id):
+        room = Room.objects.get(id=room_id)
+        form = ReservationForm(request.POST)
+        title = 'Zarezerwuj salę'
+        if form.is_valid():
+            date = form.cleaned_data['date']
+            comment = form.cleaned_data['comment']
+            error = ''
+            if Reservation.objects.filter(room=room, date=date):
+                error = 'Sala jest już zarezerwowana w tym terminie!'
+            if str(date) < str(datetime.date.today()):
+                error = 'Data jest z przeszłości!'
+            if error:
+                return render(request, 'form.html', {'form': form, 'title': title, 'room': room, 'error': error})
+            Reservation.objects.create(room=room, date=date, comment=comment)
+            return redirect('rooms')
+
+
+class RoomDetailsView(View):
+    def get(self, request, room_id):
+        room = Room.objects.get(id=room_id)
+        reservations = room.reservation_set.filter(date__gte=str(datetime.date.today())).order_by('date')
+        return render(request, 'room_details.html', {'room': room, 'reservations': reservations})
