@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block title %}Wszystkie sale{% endblock %}
+
+{% block content %}
+    <table class="table">
+        <thead>
+            <tr class="d-flex">
+                <th scope="col" class="col-1">#</th>
+                <th scope="col" class="col-2">Nazwa</th>
+                <th scope="col" class="col-1">Pojemność</th>
+                <th scope="col" class="col-5">Dostępność rzutnika</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for room in rooms %}
+            <tr class="d-flex">
+                <th scope="row" class="col-1">{{ room.id }}</th>
+                <td class="col-2">
+{#                    <a href="{% url 'room' id=room.id %}">{{ room.name }}</a>#}
+                    {{ room.name }}
+                </td>
+                <td class="col-1">{{ room.capacity }}</td>
+                {% if room.projector_availability %}
+                    <td class="col-2" style="color:green;">&#9745;</td>
+                {% else %}
+                    <td class="col-2" style="color:red;">&#9746;</td>
+                {% endif %}
+                <td class="col-1">
+                    <a href="{% url 'room-modify' id=room.id %}">edytuj</a>
+                </td>
+                <td class="col-1">
+                    <a href="{% url 'room-delete' id=room.id %}">usuń</a>
+                </td>
+                <td class="col-1">
+{#                    <a href="{% url 'room-reserve' id=room.id %}">zarezerwuj</a>#}
+                    zarezerwuj
+                </td>
+            </tr>
+                {% empty %}
+                <tr><td colspan="6">Brak dostępnych sal</td> </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

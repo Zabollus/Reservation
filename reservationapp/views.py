@@ -6,18 +6,15 @@ from reservationapp.forms import RoomAddForm
 # Create your views here.
 
 
-class LandingPageView(View):
-    def get(self, request):
-        return render(request, 'base.html')
-
-
 class RoomAddView(View):
     def get(self, request):
         form = RoomAddForm()
-        return render(request, 'form.html', {'form': form})
+        title = "Dodaj salę"
+        return render(request, 'form.html', {'form': form, 'title': title})
 
     def post(self, request):
         form = RoomAddForm(request.POST)
+        title = "Dodaj salę"
         if form.is_valid():
             name = form.cleaned_data['name']
             capacity = form.cleaned_data['capacity']
@@ -28,7 +25,54 @@ class RoomAddView(View):
             if Room.objects.filter(name=name).first():
                 error = 'Sala o podanej nazwie już istnieje'
             if error:
-                return render(request, 'form.html', {'form': form, 'error': error})
+                return render(request, 'form.html', {'form': form, 'title': title, 'error': error})
             Room.objects.create(name=name, capacity=capacity, projector_availability=projector)
             return redirect('/')
+
+
+class RoomListView(View):
+    def get(self, request):
+        rooms = Room.objects.all().order_by('id')
+        return render(request, 'rooms.html', {'rooms': rooms})
+
+
+class RoomDeleteView(View):
+    def get(self, request, room_id):
+        room = Room.objects.get(id=room_id)
+        room.delete()
+        return redirect('rooms')
+
+
+class RoomModifyView(View):
+    def get(self, request, room_id):
+        room = Room.objects.get(id=room_id)
+        title = 'Edytuj salę'
+        form = RoomAddForm(initial={
+            'name': room.name,
+            'capacity': room.capacity,
+            'projector': room.projector_availability
+        })
+        return render(request, 'form.html', {'form': form, 'title': title})
+
+    def post(self, request, room_id):
+        room = Room.objects.get(id=room_id)
+        title = 'Edytuj salę'
+        form = RoomAddForm(request.POST)
+        if form.is_valid():
+            name = form.cleaned_data['name']
+            capacity = form.cleaned_data['capacity']
+            projector = form.cleaned_data['projector']
+            error = ''
+            if capacity <= 0:
+                error = 'Pojemność sali musi być dodatnia'
+            if name != room.name and Room.objects.filter(name=name).first():
+                error = 'Sala o podanej nazwie już istnieje'
+            if error:
+                return render(request, 'form.html', {'form': form, 'title': title, 'error': error})
+            room.name = name
+            room.capacity = capacity
+            room.projector_availability = projector
+            room.save()
+            return redirect('/')
+
 
