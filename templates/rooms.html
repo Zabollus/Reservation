@@ -46,4 +46,13 @@
             {% endfor %}
         </tbody>
     </table>
+    <div class="card">
+        <div class="card-body">
+            <form action="{% url 'search' %}" method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+            <input type="submit" class="btn btn-primary" value="Wyszukaj">
+            </form>
+        </div>
+    </div>
 {% endblock %}
