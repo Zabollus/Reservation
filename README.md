@@ -1,13 +1,15 @@
 # Reservation
-## General info / Ogólne informacje
+## General info
 This is simple project in Django used for booking rooms.
 
-To prosty projekt w Django służący do rezerwacji sal.
 ## Technologies
 Project is created with:
-* Django
+* Python 3.10
+* Django 4
 * PostgreSQL
+* Bootstrap 5
 * Docker
+
 ## Setup
 Project to run requires Docker,
 to run project use command:
