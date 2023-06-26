@@ -11,6 +11,6 @@ Project is created with:
 ## Setup
 Project to run requires Docker,
 to run project use command:
-'''
+```
 $ docker compose up
-'''
+```
